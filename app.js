@@ -1,6 +1,13 @@
+// external imports
 const express = require("express");
 const dotenv = require("dotenv");
 const path = require("path");
+
+// internal imports
+const {
+  notFoundHandler,
+  errorHandler,
+} = require("./middlewares/common/errorHandler");
 
 dotenv.config();
 
@@ -18,10 +25,14 @@ app.set("view engine", "ejs");
 
 // routing setup
 
-// error handling
+// 404 not found handler
+app.use(notFoundHandler);
 
-const PORT = process.env.PORT || 3000;
+// common error handler
+app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`listening to port ${PORT}`);
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+  console.log(`listening to port ${port}`);
 });
