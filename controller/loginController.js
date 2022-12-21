@@ -2,7 +2,7 @@
 const express = require("express");
 
 function getLogin(req, res, next) {
-  res.render("index");
+  res.render("login");
 }
 
 module.exports = {
