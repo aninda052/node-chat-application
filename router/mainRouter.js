@@ -10,6 +10,6 @@ const router = express.Router();
 
 router.use("/users", userRouter);
 router.use("/inbox", inboxRouter);
-router.use("", loginRouter);
+router.use("/login", loginRouter);
 
 module.exports = router;

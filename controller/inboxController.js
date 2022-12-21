@@ -2,9 +2,7 @@
 const express = require("express");
 
 function getInbox(req, res, next) {
-  res.render("inbox", {
-    title: "Inbox Page",
-  });
+  res.render("inbox");
 }
 
 module.exports = {

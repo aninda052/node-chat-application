@@ -2,9 +2,7 @@
 const express = require("express");
 
 function getLogin(req, res, next) {
-  res.render("index", {
-    title: "Login Page",
-  });
+  res.render("index");
 }
 
 module.exports = {
