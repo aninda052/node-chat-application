@@ -9,6 +9,8 @@ const {
   errorHandler,
 } = require("./middlewares/common/errorHandler");
 
+const mainRouter = require("./router/mainRouter");
+
 dotenv.config();
 
 const app = express();
@@ -24,6 +26,7 @@ app.use(express.static(path.join(__dirname, "static")));
 app.set("view engine", "ejs");
 
 // routing setup
+app.use("", mainRouter);
 
 // 404 not found handler
 app.use(notFoundHandler);
