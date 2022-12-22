@@ -2,6 +2,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const path = require("path");
+const mongoose = require("mongoose");
 
 // internal imports
 const {
@@ -12,6 +13,14 @@ const {
 const mainRouter = require("./router/mainRouter");
 
 dotenv.config();
+
+mongoose
+  .connect(process.env.MONGO_CONNECTION_STRING, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("database connection successful!"))
+  .catch((err) => console.log(err));
 
 const app = express();
 
