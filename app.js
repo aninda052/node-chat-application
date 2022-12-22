@@ -28,11 +28,14 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// set static folder
-app.use(express.static(path.join(__dirname, "static")));
-
 // set view engine
 app.set("view engine", "ejs");
+
+// set view directory
+app.set("views", path.join(__dirname, "views"));
+
+// set static folder
+app.use(express.static(path.join(__dirname, "static")));
 
 // routing setup
 app.use("", mainRouter);
