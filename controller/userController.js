@@ -50,7 +50,22 @@ async function addUser(req, res, next) {
   }
 }
 
+async function deleteUser(req, res, next) {
+  try {
+    const user = await User.findByIdAndDelete(req.params.userId);
+
+    res.status(200).json({
+      message: "User Delete Successful",
+    });
+  } catch (err) {
+    res.status(404).json({
+      message: "User not found",
+    });
+  }
+}
+
 module.exports = {
   getUsers,
   addUser,
+  deleteUser,
 };

@@ -44,4 +44,32 @@
   </div>
 </div>
 
+<script>
+  const deleteToast = Toastify({
+    text: "User was deleted successfully!",
+    duration: 3000,
+  });
+
+  const deleteErrorToast = Toastify({
+    text: "Could not delete the user!",
+    duration: 3000,
+  });
+
+  async function deleteUser(userId) {
+    let response = await fetch(`/users/delete-user/${userId}`, {
+      method: "DELETE",
+      userId: userId,
+    });
+
+    let result = response.json();
+
+    if (result.errors) {
+      deleteErrorToast.showToast();
+    } else {
+      deleteToast.showToast();
+      document.getElementById(userId).remove();
+    }
+  }
+</script>
+
 <%- include('./partials/addUserModal')%> <%- include('./partials/footer.ejs')%>

@@ -2,7 +2,11 @@
 const express = require("express");
 
 // internal imports
-const { getUsers, addUser } = require("../controller/userController");
+const {
+  getUsers,
+  addUser,
+  deleteUser,
+} = require("../controller/userController");
 const decorateHtmlResponse = require("../middlewares/common/decorateHtmlResponse");
 const uploader = require("../middlewares/users/avaterUpload");
 const {
@@ -24,5 +28,8 @@ router.post(
   addUserValidationHandler,
   addUser
 );
+
+// delete user
+router.delete("/delete-user/:userId", deleteUser);
 
 module.exports = router;

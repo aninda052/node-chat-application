@@ -35,13 +35,16 @@
   function closeModal() {
     userModal.style.display = "none";
   }
+
   function openModal() {
     userModal.style.display = "block";
   }
+
   const successToast = Toastify({
     text: "User was added successfully! Reloading the list...",
     duration: 1000,
   });
+
   userForm.onsubmit = async (event) => {
     event.preventDefault();
 
