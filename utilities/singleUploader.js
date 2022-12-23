@@ -11,7 +11,7 @@ function uploader(
 ) {
   const UPLOAD_DIRECTORY = path.join(
     __dirname,
-    `/static/uploads/${sub_directory_name}`
+    `../static/uploads/${sub_directory_name}`
   );
 
   // multer storage
