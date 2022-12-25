@@ -2,7 +2,8 @@
 </html>
 
 <script>
-  function getCookie(name) {
+
+function getCookie(name) {
     let cookie = {};
     document.cookie.split(";").forEach(function (el) {
       let [cookieName, cookieValue] = el.split("=");
@@ -11,11 +12,27 @@
     return cookie[name];
   }
 
-
   function setCookie(cname, cvalue, exdays) {
     const d = new Date();
     d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
     let expires = "expires=" + d.toUTCString();
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
   }
+
+  function removeCookie(name) {
+    document.cookie = name + "=; Max-Age=0";
+  }
+
+  function logout() {
+    removeCookie("token");
+    window.location.href = "/login";
+  }
+
+  window.onload = function () {
+    const token = getCookie("token");
+    if (token) {
+      document.getElementById("login-tab").innerHTML =
+        '<a onclick=logout() style="cursor: pointer;">Logout</a>';
+    }
+  };
 </script>

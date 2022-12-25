@@ -23,6 +23,10 @@ function loginRequire(req, res, next) {
     }
   } catch (err) {
     if (res.locals.html) {
+      if (token) {
+        res.clearCookie(process.env.COOKIE_NAME);
+      }
+
       res.redirect("/login");
     } else {
       res.status(err.status).json({
