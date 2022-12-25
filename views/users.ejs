@@ -57,13 +57,22 @@
     duration: 3000,
   });
 
+  const headers = new Headers({
+    Authorization: getCookie("token"),
+  });
+
   async function deleteUser(userId) {
     let response = await fetch(`/users/delete-user/${userId}`, {
       method: "DELETE",
       userId: userId,
+      headers: headers,
     });
 
-    let result = response.json();
+    let result = await response.json();
+
+    if (response.status === 401) {
+      window.location.href = result.redirect;
+    }
 
     if (result.errors) {
       deleteErrorToast.showToast();

@@ -64,14 +64,23 @@
       }
     }
 
+    // set api heared
+    const headers = new Headers({
+      Authorization: getCookie("token"),
+    });
     // send request
     let response = await fetch("/users/add-user", {
       method: "POST",
       body: formData,
+      headers: headers,
     });
 
     // get json response
     let result = await response.json();
+
+    if (response.status === 401) {
+      window.location.href = result.redirect;
+    }
 
     // handle error
     if (result.errors) {
