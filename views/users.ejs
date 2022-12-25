@@ -64,7 +64,6 @@
   async function deleteUser(userId) {
     let response = await fetch(`/users/delete-user/${userId}`, {
       method: "DELETE",
-      userId: userId,
       headers: headers,
     });
 

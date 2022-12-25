@@ -13,7 +13,7 @@ const {
   addUserValidators,
   addUserValidationHandler,
 } = require("../middlewares/users/userValidators.js");
-const loginRequire = require("../middlewares/common/loginRequire");
+const { loginRequire } = require("../middlewares/common/loginRequire");
 
 const router = express.Router();
 const page_name = "Users";

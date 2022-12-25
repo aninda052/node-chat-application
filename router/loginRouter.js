@@ -6,12 +6,14 @@ const multer = require("multer");
 const { getLogin, login } = require("../controller/loginController");
 const decorateHtmlResponse = require("../middlewares/common/decorateHtmlResponse");
 
+const { redirectLoggedIn } = require("../middlewares/common/loginRequire");
+
 const router = express.Router();
 const uploader = multer();
 
 const page_name = "Login";
 
-router.get("/", decorateHtmlResponse(page_name), getLogin);
+router.get("/", decorateHtmlResponse(page_name), redirectLoggedIn, getLogin);
 
 router.post("/", uploader.none(), login);
 

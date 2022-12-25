@@ -37,4 +37,16 @@ function loginRequire(req, res, next) {
   }
 }
 
-module.exports = loginRequire;
+function redirectLoggedIn(req, res, next) {
+  const token = req.cookies[process.env.COOKIE_NAME]
+    ? req.cookies[process.env.COOKIE_NAME]
+    : null;
+
+  if (token) {
+    res.redirect("/inbox");
+  } else {
+    next();
+  }
+}
+
+module.exports = { loginRequire, redirectLoggedIn };
