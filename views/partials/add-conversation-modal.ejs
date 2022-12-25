@@ -1,0 +1,81 @@
+<div class="modal-wrapper" id="add-conversation-modal">
+  <div class="modal">
+    <a onclick="closeModal()" class="modal-close">+</a>
+    <div class="modal-title">
+      <h2>Create New Conversation</h2>
+    </div>
+    <div class="modal-body">
+      <!-- <form id="add-conversation-form"> -->
+      <input
+        type="text"
+        placeholder="search user by name or email or mobile"
+        name="user"
+        id="user"
+        autocomplete="off"
+        onkeyup="searchUserName(this.value)"
+      />
+      <p class="error"></p>
+      <div class="search_users"></div>
+      <!-- <input type="submit" value="Submit" class="hide" /> -->
+      <!-- </form> -->
+    </div>
+  </div>
+</div>
+
+<script>
+  const modal = document.querySelector("#add-conversation-modal");
+  const input = document.querySelector("input#user");
+
+  let users_placeholder = document.querySelector(".search_users");
+
+  function closeModal() {
+    modal.style.display = "none";
+    // reset
+    users_placeholder.style.display = "none";
+    input.value = "";
+  }
+  function openModal() {
+    modal.style.display = "block";
+  }
+
+  async function searchUserName(userPrefix) {
+    if (userPrefix.trim()) {
+      const headers = new Headers({
+        Authorization: getCookie("token"),
+      });
+
+      const response = await fetch(`/users/search-users/${userPrefix}`, {
+        method: "GET",
+        headers: headers,
+      });
+
+      let result = await response.json();
+
+      if (result.errors) {
+        const errorplaceholder = document.querySelector("p.error");
+        errorplaceholder.textContent = result.errors.common.msg;
+        errorplaceholder.style.display = "block";
+      } else {
+        if (result.users) {
+          let generatedHtml = "<ul>";
+          result.users.forEach((user) => {
+            const avatar = user.avatar
+              ? "./uploads/avatars/" + user.avatar
+              : "./images/nophoto.png";
+            generatedHtml += `<li onclick="createConversation('${user._id}', '${user.name}')">
+              <div class="user">
+                <div class="avatar">
+                  <img src="${avatar}" style="height: 2rem"/>
+                </div>
+                <div class="username">${user.name}</div>
+              </div>
+            </li>`;
+          });
+          generatedHtml += "</ul>";
+          users_placeholder.innerHTML = generatedHtml;
+          users_placeholder.style.display = "block";
+        }
+      }
+    }
+  }
+</script>

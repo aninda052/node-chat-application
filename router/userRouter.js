@@ -6,6 +6,7 @@ const {
   getUsers,
   addUser,
   deleteUser,
+  searchUsers,
 } = require("../controller/userController");
 const decorateHtmlResponse = require("../middlewares/common/decorateHtmlResponse");
 const uploader = require("../middlewares/users/avaterUpload");
@@ -33,5 +34,8 @@ router.post(
 
 // delete user
 router.delete("/delete-user/:userId", loginRequire, deleteUser);
+
+// search users
+router.get("/search-users/:userPrefix", loginRequire, searchUsers);
 
 module.exports = router;

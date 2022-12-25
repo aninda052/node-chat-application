@@ -17,7 +17,6 @@ async function getUsers(req, res, next) {
 
 // add user
 async function addUser(req, res, next) {
-  console.log(req.body);
   let new_user;
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
@@ -65,8 +64,28 @@ async function deleteUser(req, res, next) {
   }
 }
 
+async function searchUsers(req, res, next) {
+  try {
+    const users = await User.find({
+      $or: [
+        { name: { $regex: req.params.userPrefix + ".*" } },
+        { email: { $regex: req.params.userPrefix + ".*" } },
+      ],
+    })
+      .select("name _id avater")
+      .limit(7);
+
+    res.status(200).json({
+      users: users,
+    });
+  } catch (err) {
+    res.status(err.status).json({ errors: { common: { msg: err.message } } });
+  }
+}
+
 module.exports = {
   getUsers,
   addUser,
   deleteUser,
+  searchUsers,
 };
