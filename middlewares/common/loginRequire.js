@@ -29,7 +29,8 @@ function loginRequire(req, res, next) {
 
       res.redirect("/login");
     } else {
-      res.status(err.status).json({
+      const status = err.status || 500;
+      res.status(status).json({
         errors: {
           common: {
             mgs: err.message,
