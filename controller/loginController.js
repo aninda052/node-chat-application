@@ -39,7 +39,7 @@ async function login(req, res, next) {
 
         // set cookie
         // res.cookie(process.env.COOKIE_NAME, token, {
-        //   maxAge: process.env.JWT_EXPIRY,
+        //   maxAge: process.env.JWT_SECRET,
         //   httpOnly: true,
         //   signed: true,
         // });

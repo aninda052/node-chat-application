@@ -3,6 +3,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const path = require("path");
 const mongoose = require("mongoose");
+const cookieParser = require("cookie-parser");
 
 // internal imports
 const {
@@ -36,6 +37,9 @@ app.set("views", path.join(__dirname, "views"));
 
 // set static folder
 app.use(express.static(path.join(__dirname, "static")));
+
+// parse cookies
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // routing setup
 app.use("", mainRouter);

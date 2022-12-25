@@ -13,16 +13,18 @@ const {
   addUserValidators,
   addUserValidationHandler,
 } = require("../middlewares/users/userValidators.js");
+const loginRequire = require("../middlewares/common/loginRequire");
 
 const router = express.Router();
 const page_name = "Users";
 
 //login page
-router.get("/", decorateHtmlResponse(page_name), getUsers);
+router.get("/", decorateHtmlResponse(page_name), loginRequire, getUsers);
 
 // add user
 router.post(
   "/add-user",
+  loginRequire,
   uploader,
   addUserValidators,
   addUserValidationHandler,
@@ -30,6 +32,6 @@ router.post(
 );
 
 // delete user
-router.delete("/delete-user/:userId", deleteUser);
+router.delete("/delete-user/:userId", loginRequire, deleteUser);
 
 module.exports = router;

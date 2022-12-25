@@ -53,7 +53,7 @@
       errorPlaceholder.style.display = "block";
     } else {
       document.querySelector("p.error").style.display = "none";
-      setCookie("node-chat", result.token, 1);
+      setCookie("token", result.token, 1);
       window.location.href = "/inbox";
     }
   };
