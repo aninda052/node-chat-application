@@ -33,6 +33,12 @@ function getCookie(name) {
     if (token) {
       document.getElementById("login-tab").innerHTML =
         '<a onclick=logout() style="cursor: pointer;">Logout</a>';
+        const userRole = getCookie('role')
+        if(userRole==='admin'){
+          document.getElementById("users-tab").style.display = "block"
+        }else{
+          document.getElementById("users-tab").style.display = "none"
+        }
     }
   };
 </script>

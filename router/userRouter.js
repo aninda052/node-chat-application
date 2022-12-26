@@ -16,11 +16,19 @@ const {
 } = require("../middlewares/users/userValidators.js");
 const { loginRequire } = require("../middlewares/common/loginRequire");
 
+const { requirRole } = require("../middlewares/common/authorization");
+
 const router = express.Router();
 const page_name = "Users";
 
-//login page
-router.get("/", decorateHtmlResponse(page_name), loginRequire, getUsers);
+//Users page
+router.get(
+  "/",
+  decorateHtmlResponse(page_name),
+  loginRequire,
+  requirRole(["admin"]),
+  getUsers
+);
 
 // add user
 router.post(
