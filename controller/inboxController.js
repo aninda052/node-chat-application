@@ -5,6 +5,7 @@ const createError = require("http-errors");
 // internal imports
 const Conversation = require("../models/conversation");
 const User = require("../models/user");
+const Message = require("../models/message");
 
 async function getInbox(req, res, next) {
   try {
@@ -45,7 +46,21 @@ async function createConversation(req, res, next) {
   }
 }
 
+async function getMessage(req, res, next) {
+  try {
+    const messaages = await Message.find({
+      conversation_id: req.params.conversationId,
+    });
+    res.status(200).json({
+      messages: messaages,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   getInbox,
   createConversation,
+  getMessage,
 };

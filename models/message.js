@@ -1,18 +1,22 @@
-// external imports
+// external import
 const mongoose = require("mongoose");
 
-const conversationSchema = mongoose.Schema(
+const messageSchema = mongoose.Schema(
   {
-    creator: {
+    message: {
+      type: String,
+    },
+    sender: {
       _id: mongoose.Types.ObjectId,
       name: String,
       avatar: String,
     },
-    participant: {
+    reciever: {
       _id: mongoose.Types.ObjectId,
       name: String,
       avatar: String,
     },
+    conversation_id: mongoose.Types.ObjectId,
   },
   {
     timestamps: {
@@ -22,6 +26,6 @@ const conversationSchema = mongoose.Schema(
   }
 );
 
-const Conversation = mongoose.model("Conversation", conversationSchema);
+const Message = mongoose.model("Message", messageSchema);
 
-module.exports = Conversation;
+module.exports = Message;
