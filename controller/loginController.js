@@ -28,8 +28,9 @@ async function login(req, res, next) {
           name: user.name,
           mobile: user.mobile,
           email: user.email,
-          id: user._id,
+          _id: user._id,
           role: user.role,
+          avatar: user.avatar || null,
         };
 
         // generate token
@@ -53,7 +54,7 @@ async function login(req, res, next) {
       throw createError(401, "Wrong Username or Pasword");
     }
   } catch (err) {
-    res.json({ errors: { common: { msg: err.message } } });
+    next(err);
   }
 }
 

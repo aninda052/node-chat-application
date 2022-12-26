@@ -8,7 +8,9 @@ function notFoundHandler(req, res, next) {
 // default error handler
 function errorHandler(err, req, res, next) {
   res.locals.error =
-    process.env.NODE_ENV === "development" ? err : { message: err.message };
+    process.env.NODE_ENV === "development"
+      ? err
+      : { errors: { message: err.message } };
 
   res.status(err.status || 500);
 
@@ -17,7 +19,9 @@ function errorHandler(err, req, res, next) {
       title: "Error page",
     });
   } else {
-    res.json(res.locals.error);
+    res.json({
+      errors: res.locals.error,
+    });
   }
 }
 

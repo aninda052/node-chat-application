@@ -1,5 +1,6 @@
 // external imports
 const bcrypt = require("bcrypt");
+const createError = require("http-errors");
 
 // internal imports
 const User = require("../models/user");
@@ -40,13 +41,7 @@ async function addUser(req, res, next) {
       message: "User was added successfully!",
     });
   } catch (err) {
-    res.status(500).json({
-      errors: {
-        common: {
-          msg: "Unknown error occured!",
-        },
-      },
-    });
+    next(err);
   }
 }
 
@@ -58,9 +53,7 @@ async function deleteUser(req, res, next) {
       message: "User Delete Successful",
     });
   } catch (err) {
-    res.status(404).json({
-      message: "User not found",
-    });
+    next(createError(404, "User not found"));
   }
 }
 
@@ -68,8 +61,8 @@ async function searchUsers(req, res, next) {
   try {
     const users = await User.find({
       $or: [
-        { name: { $regex: req.params.userPrefix + ".*" } },
-        { email: { $regex: req.params.userPrefix + ".*" } },
+        { name: { $regex: req.params.userPrefix } },
+        { email: { $regex: req.params.userPrefix } },
       ],
     })
       .select("name _id avater")
@@ -79,7 +72,7 @@ async function searchUsers(req, res, next) {
       users: users,
     });
   } catch (err) {
-    res.status(err.status).json({ errors: { common: { msg: err.message } } });
+    next(err);
   }
 }
 

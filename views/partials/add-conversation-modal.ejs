@@ -79,7 +79,7 @@
     }
   }
 
-  async function createConversation(userId, username) {
+  async function createConversation(participantId, participantName) {
     const headers = new Headers({
       Authorization: getCookie("token"),
       "Content-Type": "application/json; charset=UTF-8",
@@ -88,10 +88,17 @@
     const response = await fetch("inbox/create-conversation", {
       method: "POST",
       body: JSON.stringify({
-        userId: userId,
-        username: username,
+        participantId: participantId,
+        participantName: participantName,
       }),
       headers: headers,
     });
+    const result = await response.json();
+    if (result.errors) {
+      console.log(result.errors.message);
+    } else {
+      closeModal();
+      location.reload();
+    }
   }
 </script>
