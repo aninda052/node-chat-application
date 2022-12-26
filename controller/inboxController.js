@@ -59,8 +59,22 @@ async function getMessage(req, res, next) {
   }
 }
 
+async function deleteConversation(req, res, next) {
+  try {
+    const messaages = await Conversation.findByIdAndDelete(
+      req.params.conversationId
+    );
+    res.status(200).json({
+      message: "User Delete Successful",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   getInbox,
   createConversation,
   getMessage,
+  deleteConversation,
 };

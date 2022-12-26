@@ -6,6 +6,7 @@ const {
   getInbox,
   createConversation,
   getMessage,
+  deleteConversation,
 } = require("../controller/inboxController");
 const decorateHtmlResponse = require("../middlewares/common/decorateHtmlResponse");
 const { loginRequire } = require("../middlewares/common/loginRequire");
@@ -18,5 +19,11 @@ router.get("/", decorateHtmlResponse(page_name), loginRequire, getInbox);
 router.post("/create-conversation", loginRequire, createConversation);
 
 router.get("/get-message/:conversationId", loginRequire, getMessage);
+
+router.delete(
+  "/delete-conversation/:conversationId",
+  loginRequire,
+  deleteConversation
+);
 
 module.exports = router;
