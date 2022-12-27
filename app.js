@@ -5,6 +5,9 @@ const path = require("path");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 
+const http = require("http");
+const socket = require("socket.io");
+
 // internal imports
 const {
   notFoundHandler,
@@ -24,6 +27,11 @@ mongoose
   .catch((err) => console.log(err));
 
 const app = express();
+
+const server = http.createServer(app);
+// socket creation
+const io = socket(server);
+global.io = io;
 
 // request parsers
 app.use(express.json());
@@ -50,8 +58,8 @@ app.use(notFoundHandler);
 // common error handler
 app.use(errorHandler);
 
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
-app.listen(port, () => {
-  console.log(`listening to port ${port}`);
+server.listen(PORT, () => {
+  console.log(`listening to port ${PORT}`);
 });
