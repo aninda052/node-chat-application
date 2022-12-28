@@ -4,7 +4,7 @@ const uploader = require("../../utilities/singleUploader");
 function avaterUpload(req, res, next) {
   //uploader function will return a multer object
   const upload = uploader(
-    "avatars",
+    process.env.AVATAR_UPLOAD_DIRECTORY,
     ["image/jpeg", "image/jpg", "image/png"],
     1000000,
     "Only .jpg, jpeg or .png format allowed!"

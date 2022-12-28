@@ -69,13 +69,7 @@
 
   <form id="chat-form" method="post" enctype="multipart/form-data">
     <img src="./images/attachment.png" alt="Add A ttachment" />
-    <input
-      type="file"
-      multiple
-      name="attachment"
-      id="attachment"
-      class="hide"
-    />
+    <input type="file" multiple name="attachment" id="attachment" />
     <input
       type="text"
       name="message"
@@ -150,15 +144,16 @@ include('./partials/footer.ejs')%>
 
   messageForm.onsubmit = (event) => {
     event.preventDefault();
+    const attachments = messageForm.elements["attachment"].files;
+    const message = messageForm.elements["message"].value;
 
-    const formData = new FormData(messageForm);
-    formData.append("conversationId", current_conversation_id);
-    formData.append("receiverId", "63a61c837b9525b2c0c14103");
-    formData.append("receiverName", "Aninda 1");
-    formData.append("avatar", "");
-
-    socket.emit("message", {
-      body: formData,
+    socket.emit("message", attachments, {
+      body: {
+        conversationId: current_conversation_id,
+        receiverId: "63a61c837b9525b2c0c14103",
+        receiverName: "aninda 1",
+        message: message,
+      },
     });
   };
 
