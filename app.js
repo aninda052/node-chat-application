@@ -16,6 +16,8 @@ const {
 
 const mainRouter = require("./router/mainRouter");
 
+const messageListener = require("./controller/socket");
+
 dotenv.config();
 
 mongoose
@@ -30,8 +32,13 @@ const app = express();
 
 const server = http.createServer(app);
 // socket creation
-const io = socket(server);
-global.io = io;
+const io = socket(server, {
+  path: "/chat",
+});
+
+io.on("connection", function (socket) {
+  messageListener(io, socket);
+});
 
 // request parsers
 app.use(express.json());
