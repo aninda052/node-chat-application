@@ -109,7 +109,7 @@ include('./partials/footer.ejs')%>
     if (result.errors) {
       console.log(result.errors.message);
     } else {
-      document.getElementById("conversation-partner").innerText = "";
+      chatTitleContainer.textContent = "";
       document.getElementById("delete-conversation").removeAttribute("onclick");
       document.getElementById(conversationId).remove();
     }
@@ -127,6 +127,11 @@ include('./partials/footer.ejs')%>
     if (result.errors) {
       console.log(result.errors.message);
     } else {
+      const messagesFailureToast = Toastify({
+        text: "Error loading messages!",
+        duration: 1000,
+      });
+
       chatTitleContainer.textContent = participantName;
       messageForm.elements["conversationId"].value = conversationId;
 
@@ -142,8 +147,51 @@ include('./partials/footer.ejs')%>
       document
         .getElementById("delete-conversation")
         .setAttribute("onclick", `deleteConversation('${conversationId}')`);
+
+      if (result.messages) {
+        let allMessages = "";
+        if (result.messages.length > 0) {
+          result.messages.forEach((message) => {
+            let senderAvatar = message.sender.avatar
+              ? `./uploads/avatars/${message.sender.avatar}`
+              : "./images/nophoto.png";
+            const messageClass =
+              message.sender.id === loggedinUserId
+                ? "you-message"
+                : "other-message";
+            const showAvatar =
+              message.sender.id === loggedinUserId
+                ? ""
+                : `<img src="${senderAvatar}" alt="${message.sender.name}" />`;
+            // message attachments
+            let attachments = '<div class="attachments">';
+            if (message.attachment && message.attachment.length > 0) {
+              message.attachment.forEach((attachment) => {
+                attachments += `<img src="./uploads/attachments/${attachment}" /> `;
+              });
+            }
+            attachments += "</div>";
+            // final message html
+            let messageHTML = `<div class="message-row ${messageClass}"><div class="message-content">
+                      ${showAvatar}
+                      <div class="message-text">${message.message}</div>
+                      ${attachments}
+                      <div class="message-time">${moment(
+                        message.date_time
+                      ).fromNow()}</div>
+                    </div></div>`;
+            allMessages += messageHTML;
+            messageContainer.innerHTML = allMessages;
+          });
+        } else if (result.messages.length === 0) {
+          messageContainer.innerHTML = '<div class="message-row"></div>';
+        }
+      } else {
+        messagesFailureToast.showToast();
+      }
     }
   }
+
   const socket = io("<%= process.env.APP_URL %>", {
     path: "/chat",
     query: {
