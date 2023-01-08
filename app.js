@@ -15,8 +15,10 @@ const {
 } = require("./middlewares/common/errorHandler");
 
 const mainRouter = require("./router/mainRouter");
-
-const messageListener = require("./controller/socket");
+const {
+  messageListener,
+  trackUserSocketConnection,
+} = require("./controller/socket");
 
 dotenv.config();
 
@@ -37,6 +39,8 @@ const io = socket(server, {
 });
 
 io.on("connection", function (socket) {
+  trackUserSocketConnection(socket);
+
   messageListener(io, socket);
 });
 

@@ -140,7 +140,12 @@ include('./partials/footer.ejs')%>
         .setAttribute("onclick", `deleteConversation('${conversationId}')`);
     }
   }
-  const socket = io("<%= process.env.APP_URL %>", { path: "/chat" });
+  const socket = io("<%= process.env.APP_URL %>", {
+    path: "/chat",
+    query: {
+      userid: loggedinUserId,
+    },
+  });
 
   messageForm.onsubmit = (event) => {
     event.preventDefault();
