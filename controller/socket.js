@@ -22,13 +22,13 @@ function messageListener(io, socket) {
     //   });
     // }
     // console.log(socket.id);
-    const receiverId = payload.body.conversationId;
+    const receiverId = payload.body["conversationId"];
     const receiverSocketId = connectedUsers[receiverId] || "";
 
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("message", {
-      message: payload.body,
-    });
+        message: payload.body,
+      });
     }
   });
 }

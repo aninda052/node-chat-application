@@ -7,11 +7,11 @@
   <div id="conversation-list">
     <% data.forEach(function(conversation) { %>
     <!-- conversation creator is same to logged in user, so we need to show participant name and avatar -->
-    <% if(conversation.creator.id == loggedInUser.userid) { %>
+    <% if(conversation.creator._id == loggedInUser._id) { %>
     <div
       class="conversation"
       id="<%= conversation._id %>"
-      onclick="getMessages('<%= conversation._id %>', '<%= conversation.participant.name %>')"
+      onclick="getMessages('<%= conversation.participant._id %>', '<%= conversation.participant.name %>')"
     >
       <% if (conversation.participant.avatar) { %>
       <img
@@ -27,7 +27,7 @@
     <% } else { %>
     <div
       class="conversation"
-      onclick="getMessages('<%= conversation._id %>', '<%= conversation.participant.name %>')"
+      onclick="getMessages('<%= conversation.creator._id %>', '<%= conversation.creator.name %>')"
     >
       <% if (conversation.creator.avatar) { %>
       <img
@@ -38,9 +38,7 @@
       <img src="./images/nophoto.png" />
       <% } %>
       <div class="title-text"><%= conversation.creator.name %></div>
-      <div class="conversation-date">
-        <%= moment(conversation.last_updated).fromNow() %>
-      </div>
+      <div class="conversation-date"><%= conversation.last_updated %></div>
     </div>
     <% } %> <% }); %>
 
@@ -135,15 +133,6 @@ include('./partials/footer.ejs')%>
       chatTitleContainer.textContent = participantName;
       messageForm.elements["conversationId"].value = conversationId;
 
-      // document.getElementById("delete-conversation").click =
-      //   deleteConversation(conversationId);
-
-      // document
-      //   .getElementById("delete-conversation")
-      //   .addEventListener("click", function (conversationId) {
-      //     deleteConversation(conversationId);
-      //   });
-
       document
         .getElementById("delete-conversation")
         .setAttribute("onclick", `deleteConversation('${conversationId}')`);
@@ -202,16 +191,61 @@ include('./partials/footer.ejs')%>
   messageForm.onsubmit = (event) => {
     event.preventDefault();
     const attachments = messageForm.elements["attachment"].files;
+    const message = messageForm.elements["message"].value;
 
-    socket.emit("message", attachments, {
-      body: {
-        conversationId: messageForm.elements["conversationId"].value,
-        message: messageForm.elements["message"].value,
-      },
-    });
+    if (message) {
+      socket.emit("message", attachments, {
+        body: {
+          conversationId: messageForm.elements["conversationId"].value,
+          message: messageForm.elements["message"].value,
+          sender: {
+            name: getCookie("username"),
+            avatar: getCookie("avatar"),
+            _id: loggedinUserId,
+          },
+        },
+      });
+      messageForm.reset();
+    }
   };
 
   socket.on("message", (payload) => {
     console.log(payload);
+
+    // message class
+    const messageClass =
+      payload.message.sender._id === loggedinUserId
+        ? "you-message"
+        : "other-message";
+
+    const senderAvatar = payload.message.sender.avatar
+      ? `<img src="./uploads/avatars/${payload.message.sender.avatar}" alt="${payload.message.sender.name}" />`
+      : `<img src="./images/nophoto.png" alt="${payload.message.sender.name}" />`;
+    // message attachments
+    let attachments = '<div class="attachments">';
+    if (payload.message.attachment && payload.message.attachment.length > 0) {
+      payload.message.attachment.forEach((attachment) => {
+        attachments += `<img src="./uploads/attachments/${attachment}" /> `;
+      });
+    }
+    attachments += "</div>";
+    let messageHTML;
+    // do not show avatar for loggedin user
+    if (payload.message.sender._id == loggedinUserId._d) {
+      messageHTML = `<div class="message-row ${messageClass}"><div class="message-content">
+              <div class="message-text">${payload.message.message}</div>
+              ${attachments}
+              <div class="message-time">${payload.message.created_at}</div>
+            </div></div>`;
+    } else {
+      messageHTML = `<div class="message-row ${messageClass}"><div class="message-content">
+              ${senderAvatar}
+              <div class="message-text">${payload.message.message}</div>
+              ${attachments}
+              <div class="message-time">${payload.message.created_at}</div>
+            </div></div>`;
+    }
+    // append the inoming message to message area as last item
+    messageContainer.insertAdjacentHTML("beforeBegin", messageHTML);
   });
 </script>

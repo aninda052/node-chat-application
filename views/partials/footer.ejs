@@ -9,7 +9,7 @@ function getCookie(name) {
       let [cookieName, cookieValue] = el.split("=");
       cookie[cookieName.trim()] = cookieValue;
     });
-    return cookie[name];
+    return cookie[name] || "";
   }
 
   function setCookie(cname, cvalue, exdays) {

@@ -38,6 +38,11 @@ const io = socket(server, {
   path: "/chat",
 });
 
+// io.engine.generateId = function (req) {
+//   // set user id as new custom id
+//   return req._query.uid;
+// };
+
 io.on("connection", function (socket) {
   trackUserSocketConnection(socket);
 
