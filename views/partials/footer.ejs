@@ -25,6 +25,8 @@ function getCookie(name) {
 
   function logout() {
     removeCookie("token");
+    removeCookie("role");
+    removeCookie("userid");
     window.location.href = "/login";
   }
 

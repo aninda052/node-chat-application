@@ -22,7 +22,7 @@ function messageListener(io, socket) {
     //   });
     // }
     // console.log(socket.id);
-    const receiverId = payload.body.receiverId;
+    const receiverId = payload.body.conversationId;
     const receiverSocketId = connectedUsers[receiverId] || "";
 
     if (receiverSocketId) {

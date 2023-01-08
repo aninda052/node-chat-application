@@ -48,6 +48,7 @@
       document.querySelector("p.error").style.display = "none";
       setCookie("token", result.token, 1);
       setCookie("role", result.user.role, 1);
+      setCookie("userid", result.user._id, 1);
       window.location.href = "/inbox";
     }
   };
