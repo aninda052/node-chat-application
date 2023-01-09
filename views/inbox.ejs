@@ -11,7 +11,7 @@
     <div
       class="conversation"
       id="<%= conversation._id %>"
-      onclick="getMessages('<%= conversation.participant._id %>', '<%= conversation.participant.name %>')"
+      onclick="getMessages('<%= conversation._id %>', '<%= conversation.participant._id %>', '<%= conversation.participant.name %>')"
     >
       <% if (conversation.participant.avatar) { %>
       <img
@@ -27,7 +27,7 @@
     <% } else { %>
     <div
       class="conversation"
-      onclick="getMessages('<%= conversation.creator._id %>', '<%= conversation.creator.name %>')"
+      onclick="getMessages('<%= conversation._id %>', '<%= conversation.creator._id %>', '<%= conversation.creator.name %>')"
     >
       <% if (conversation.creator.avatar) { %>
       <img
@@ -61,13 +61,19 @@
     />
   </div>
 
-  <div id="chat-message-list">
-    <div class="none">Start a Conversation</div>
-  </div>
+  <div id="chat-message-list"></div>
 
   <form id="chat-form" method="post" enctype="multipart/form-data">
-    <img src="./images/attachment.png" alt="Add A ttachment" />
-    <input type="file" multiple name="attachment" id="attachment" />
+    <label for="attachment">
+      <img src="./images/attachment.png" alt="Add Attachment" />
+    </label>
+    <input
+      class="hide"
+      type="file"
+      multiple
+      name="attachment"
+      id="attachment"
+    />
     <input
       type="text"
       name="message"
@@ -88,8 +94,62 @@ include('./partials/footer.ejs')%>
   const messageContainer = document.querySelector("#chat-message-list");
   const chatTitleContainer = document.querySelector("#conversation-partner");
   const messageForm = document.querySelector("#chat-form");
-
   const loggedinUserId = getCookie("userid");
+
+  const socket = io("<%= process.env.APP_URL %>", {
+    path: "/chat",
+    query: {
+      userid: loggedinUserId,
+    },
+  });
+
+  function showMgs(data) {
+    // message class
+    const messageClass =
+      data.message.sender._id === loggedinUserId
+        ? "you-message"
+        : "other-message";
+
+    // message attachments
+    let attachments = '<div class="attachments">';
+    if (data.message.attachment && data.message.attachment.length > 0) {
+      data.message.attachment.forEach((attachment) => {
+        attachments += `<img src="./uploads/attachments/${attachment}" /> `;
+      });
+    }
+    attachments += "</div>";
+    let messageHTML;
+    // do not show avatar for loggedin user
+    if (data.message.sender._id == loggedinUserId._d) {
+      messageHTML = `
+        <div class="message-row ${messageClass}">
+          <div class="message-content">
+              <div class="message-text">${data.message.message}</div>
+              ${attachments}
+              <div class="message-time">${moment(
+                data.message.created_at
+              ).fromNow()}</div>
+          </div>
+        </div>`;
+    } else {
+      const senderAvatar = data.message.sender.avatar
+        ? `<img src="./uploads/avatars/${data.message.sender.avatar}" alt="${data.message.sender.name}" />`
+        : `<img src="./images/nophoto.png" alt="${data.message.sender.name}" />`;
+
+      messageHTML = `
+            <div class="message-row ${messageClass}">
+              <div class="message-content">${senderAvatar}
+                  <div class="message-text">${data.message.message}</div>
+                  ${attachments}
+                  <div class="message-time">${moment(
+                    data.message.created_at
+                  ).fromNow()}</div>
+              </div>
+            </div>`;
+    }
+    // append the inoming message to message area as last item
+    messageContainer.insertAdjacentHTML("afterbegin", messageHTML);
+  }
 
   async function deleteConversation(conversationId) {
     const response = await fetch(
@@ -113,7 +173,7 @@ include('./partials/footer.ejs')%>
     }
   }
 
-  async function getMessages(conversationId, participantName) {
+  async function getMessages(conversationId, participantId, participantName) {
     const response = await fetch(`/inbox/get-message/${conversationId}`, {
       method: "GET",
       headers: {
@@ -131,7 +191,7 @@ include('./partials/footer.ejs')%>
       });
 
       chatTitleContainer.textContent = participantName;
-      messageForm.elements["conversationId"].value = conversationId;
+      messageForm.elements["conversationId"].value = participantId;
 
       document
         .getElementById("delete-conversation")
@@ -141,36 +201,7 @@ include('./partials/footer.ejs')%>
         let allMessages = "";
         if (result.messages.length > 0) {
           result.messages.forEach((message) => {
-            let senderAvatar = message.sender.avatar
-              ? `./uploads/avatars/${message.sender.avatar}`
-              : "./images/nophoto.png";
-            const messageClass =
-              message.sender.id === loggedinUserId
-                ? "you-message"
-                : "other-message";
-            const showAvatar =
-              message.sender.id === loggedinUserId
-                ? ""
-                : `<img src="${senderAvatar}" alt="${message.sender.name}" />`;
-            // message attachments
-            let attachments = '<div class="attachments">';
-            if (message.attachment && message.attachment.length > 0) {
-              message.attachment.forEach((attachment) => {
-                attachments += `<img src="./uploads/attachments/${attachment}" /> `;
-              });
-            }
-            attachments += "</div>";
-            // final message html
-            let messageHTML = `<div class="message-row ${messageClass}"><div class="message-content">
-                      ${showAvatar}
-                      <div class="message-text">${message.message}</div>
-                      ${attachments}
-                      <div class="message-time">${moment(
-                        message.date_time
-                      ).fromNow()}</div>
-                    </div></div>`;
-            allMessages += messageHTML;
-            messageContainer.innerHTML = allMessages;
+            showMgs({ message });
           });
         } else if (result.messages.length === 0) {
           messageContainer.innerHTML = '<div class="message-row"></div>';
@@ -181,28 +212,29 @@ include('./partials/footer.ejs')%>
     }
   }
 
-  const socket = io("<%= process.env.APP_URL %>", {
-    path: "/chat",
-    query: {
-      userid: loggedinUserId,
-    },
-  });
-
   messageForm.onsubmit = (event) => {
     event.preventDefault();
     const attachments = messageForm.elements["attachment"].files;
     const message = messageForm.elements["message"].value;
 
     if (message) {
+      const sender = {
+        name: getCookie("username"),
+        avatar: getCookie("avatar"),
+        _id: loggedinUserId,
+      };
+
+      showMgs({
+        message: {
+          message: message,
+          sender: sender,
+        },
+      });
       socket.emit("message", attachments, {
         body: {
           conversationId: messageForm.elements["conversationId"].value,
-          message: messageForm.elements["message"].value,
-          sender: {
-            name: getCookie("username"),
-            avatar: getCookie("avatar"),
-            _id: loggedinUserId,
-          },
+          message: message,
+          sender: sender,
         },
       });
       messageForm.reset();
@@ -210,42 +242,6 @@ include('./partials/footer.ejs')%>
   };
 
   socket.on("message", (payload) => {
-    console.log(payload);
-
-    // message class
-    const messageClass =
-      payload.message.sender._id === loggedinUserId
-        ? "you-message"
-        : "other-message";
-
-    const senderAvatar = payload.message.sender.avatar
-      ? `<img src="./uploads/avatars/${payload.message.sender.avatar}" alt="${payload.message.sender.name}" />`
-      : `<img src="./images/nophoto.png" alt="${payload.message.sender.name}" />`;
-    // message attachments
-    let attachments = '<div class="attachments">';
-    if (payload.message.attachment && payload.message.attachment.length > 0) {
-      payload.message.attachment.forEach((attachment) => {
-        attachments += `<img src="./uploads/attachments/${attachment}" /> `;
-      });
-    }
-    attachments += "</div>";
-    let messageHTML;
-    // do not show avatar for loggedin user
-    if (payload.message.sender._id == loggedinUserId._d) {
-      messageHTML = `<div class="message-row ${messageClass}"><div class="message-content">
-              <div class="message-text">${payload.message.message}</div>
-              ${attachments}
-              <div class="message-time">${payload.message.created_at}</div>
-            </div></div>`;
-    } else {
-      messageHTML = `<div class="message-row ${messageClass}"><div class="message-content">
-              ${senderAvatar}
-              <div class="message-text">${payload.message.message}</div>
-              ${attachments}
-              <div class="message-time">${payload.message.created_at}</div>
-            </div></div>`;
-    }
-    // append the inoming message to message area as last item
-    messageContainer.insertAdjacentHTML("beforeBegin", messageHTML);
+    showMgs(payload);
   });
 </script>
