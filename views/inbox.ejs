@@ -98,8 +98,8 @@ include('./partials/footer.ejs')%>
 
   const socket = io("<%= process.env.APP_URL %>", {
     path: "/chat",
-    query: {
-      userid: loggedinUserId,
+    auth: {
+      token: getCookie("token"),
     },
   });
 

@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const path = require("path");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 const http = require("http");
 const socket = require("socket.io");
@@ -17,7 +18,7 @@ const {
 const mainRouter = require("./router/mainRouter");
 const {
   messageListener,
-  trackUserSocketConnection,
+  authSocketMiddleware,
 } = require("./controller/socket");
 
 dotenv.config();
@@ -38,14 +39,11 @@ const io = socket(server, {
   path: "/chat",
 });
 
-// io.engine.generateId = function (req) {
-//   // set user id as new custom id
-//   return req._query.uid;
-// };
+io.use((socket, next) => {
+  authSocketMiddleware(socket, next);
+});
 
 io.on("connection", function (socket) {
-  trackUserSocketConnection(socket);
-
   messageListener(io, socket);
 });
 
