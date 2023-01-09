@@ -65,7 +65,7 @@ async function searchUsers(req, res, next) {
         { email: { $regex: req.params.userPrefix } },
       ],
     })
-      .select("name _id avater")
+      .select("name _id avatar")
       .limit(7);
 
     res.status(200).json({
