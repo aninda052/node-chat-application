@@ -11,7 +11,7 @@
     <div
       class="conversation"
       id="<%= conversation._id %>"
-      onclick="getMessages('<%= conversation._id %>', '<%= conversation.participant._id %>', '<%= conversation.participant.name %>')"
+      onclick="getMessages('<%= conversation._id %>', '<%= conversation.participant._id %>', '<%= conversation.participant.name %>', '<%= conversation.participant.avatar %>')"
     >
       <% if (conversation.participant.avatar) { %>
       <img
@@ -27,7 +27,7 @@
     <% } else { %>
     <div
       class="conversation"
-      onclick="getMessages('<%= conversation._id %>', '<%= conversation.creator._id %>', '<%= conversation.creator.name %>')"
+      onclick="getMessages('<%= conversation._id %>', '<%= conversation.creator._id %>', '<%= conversation.creator.name %>', '<%= conversation.creator.avatar %>')"
     >
       <% if (conversation.creator.avatar) { %>
       <img
@@ -53,7 +53,8 @@
   </div>
 
   <div id="chat-title">
-    <span id="conversation-partner"></span>
+    <img id="participant-avatar"></img>
+    <span id="participant-name"></span>
     <img
       id="delete-conversation"
       src="./images/trash.png"
@@ -93,7 +94,7 @@ include('./partials/footer.ejs')%>
 
 <script>
   const messageContainer = document.querySelector("#chat-message-list");
-  const chatTitleContainer = document.querySelector("#conversation-partner");
+  const participantContainer = document.querySelector("#chat-title");
   const messageForm = document.querySelector("#chat-form");
   const loggedinUserId = getCookie("userid");
 
@@ -172,12 +173,19 @@ include('./partials/footer.ejs')%>
       console.log(result.errors.message);
     } else {
       chatTitleContainer.textContent = "";
-      document.getElementById("delete-conversation").removeAttribute("onclick");
+      participantContainer
+        .querySelector("delete-conversation")
+        .removeAttribute("onclick");
       document.getElementById(conversationId).remove();
     }
   }
 
-  async function getMessages(conversationId, participantId, participantName) {
+  async function getMessages(
+    conversationId,
+    participantId,
+    participantName,
+    participantAvatar
+  ) {
     const response = await fetch(`/inbox/get-message/${conversationId}`, {
       method: "GET",
       headers: {
@@ -194,12 +202,16 @@ include('./partials/footer.ejs')%>
         duration: 1000,
       });
 
-      chatTitleContainer.textContent = participantName;
+      participantContainer.querySelector("#participant-name").textContent =
+        participantName;
+      participantContainer
+        .querySelector("#participant-avatar")
+        .setAttribute("src", participantAvatar ? `./uploads/avatars/${participantAvatar}`: "./images/nophoto.png");
       messageForm.elements["recieverId"].value = participantId;
       messageForm.elements["conversationId"].value = conversationId;
 
-      document
-        .getElementById("delete-conversation")
+      participantContainer
+        .querySelector("#delete-conversation")
         .setAttribute("onclick", `deleteConversation('${conversationId}')`);
 
       if (result.messages) {
