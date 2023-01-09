@@ -112,10 +112,13 @@ include('./partials/footer.ejs')%>
 
     // message attachments
     let attachments = '<div class="attachments">';
-    if (data.message.attachment && data.message.attachment.length > 0) {
-      data.message.attachment.forEach((attachment) => {
-        attachments += `<img src="./uploads/attachments/${attachment}" /> `;
-      });
+    if (data.message.attachments && data.message.attachments.length > 0) {
+      if (data.message.attachments instanceof Array) {
+        data.message.attachments.forEach((attachment) => {
+          attachments += `<img src="./uploads/attachments/${attachment}" /> `;
+        });
+      } else {
+      }
     }
     attachments += "</div>";
     let messageHTML;
@@ -217,7 +220,7 @@ include('./partials/footer.ejs')%>
     const attachments = messageForm.elements["attachment"].files;
     const message = messageForm.elements["message"].value;
 
-    if (message) {
+    if (message || attachments) {
       const sender = {
         name: getCookie("username"),
         avatar: getCookie("avatar"),
@@ -228,6 +231,7 @@ include('./partials/footer.ejs')%>
         message: {
           message: message,
           sender: sender,
+          attachments: attachments,
         },
       });
       socket.emit("message", attachments, {
