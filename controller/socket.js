@@ -3,10 +3,14 @@ const path = require("path");
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 
+// internal imports
+const Message = require("../models/message");
+const User = require("../models/user");
+
 let connectedUsers = {};
 
 function messageListener(io, socket) {
-  socket.on("message", (attachments, payload) => {
+  socket.on("message", async (attachments, payload) => {
     if (attachments[0] != undefined) {
       const UPLOAD_DIRECTORY = path.join(
         __dirname,
@@ -17,14 +21,28 @@ function messageListener(io, socket) {
       });
     }
 
-    const receiverId = payload.body["conversationId"];
+    const receiverId = payload.body["recieverId"];
     const receiverSocketId = connectedUsers[receiverId] || "";
+
+    const receiver = await User.findById(receiverId);
+
+    const message = new Message({
+      sender: socket.user,
+      reciever: receiver,
+      message: payload.body.message,
+      conversation_id: payload.body["conversationId"],
+    });
+    message.save();
 
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("message", {
         message: {
-          sender: payload.body.sender,
-          message: message,
+          sender: {
+            _id: socket.user._id,
+            name: socket.user.name,
+            avatar: socket.user.avatar,
+          },
+          message: payload.body.message,
           attachments: attachments,
         },
       });

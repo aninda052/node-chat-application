@@ -81,6 +81,7 @@
       autocomplete="off"
     />
     <input id="conversationId" type="hidden" name="conversationId" />
+    <input id="recieverId" type="hidden" name="recieverId" />
   </form>
 </div>
 
@@ -194,7 +195,8 @@ include('./partials/footer.ejs')%>
       });
 
       chatTitleContainer.textContent = participantName;
-      messageForm.elements["conversationId"].value = participantId;
+      messageForm.elements["recieverId"].value = participantId;
+      messageForm.elements["conversationId"].value = conversationId;
 
       document
         .getElementById("delete-conversation")
@@ -237,8 +239,8 @@ include('./partials/footer.ejs')%>
       socket.emit("message", attachments, {
         body: {
           conversationId: messageForm.elements["conversationId"].value,
+          recieverId: messageForm.elements["recieverId"].value,
           message: message,
-          sender: sender,
         },
       });
       messageForm.reset();
